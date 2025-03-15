@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superheroes CRUD</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        table { width: 80%; margin: auto; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 10px; text-align: center; }
+        img { width: 50px; height: 50px; border-radius: 50%; }
+        button { padding: 5px 10px; margin: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>Superheroes CRUD</h1>
+
+    <!-- Form to Add Superhero -->
+    <h2>Add a Superhero</h2>
+    <form id="superheroForm">
+        <input type="text" id="real_name" placeholder="Real Name" required>
+        <input type="text" id="hero_name" placeholder="Hero Name" required>
+        <input type="text" id="photo_url" placeholder="Photo URL" required>
+        <input type="text" id="additional_info" placeholder="Additional Info" required>
+        <button type="submit">Add Superhero</button>
+    </form>
+
+    <!-- Display Superheroes -->
+    <h2>Superheroes List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Photo</th>
+                <th>Real Name</th>
+                <th>Hero Name</th>
+                <th>Info</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="superheroesTable"></tbody>
+    </table>
+
+    <script>
+        const apiBaseUrl = "http://localhost:3000/api/superheroes";
+
+        // 📌 Fetch and Display Superheroes
+        async function fetchSuperheroes() {
+            const response = await fetch(apiBaseUrl);
+            const superheroes = await response.json();
+            const table = document.getElementById("superheroesTable");
+            table.innerHTML = "";
+            superheroes.forEach(hero => {
+                const row = `<tr>
+                    <td><img src="${hero.photo_url}" alt="${hero.hero_name}"></td>
+                    <td>${hero.real_name}</td>
+                    <td>${hero.hero_name}</td>
+                    <td>${hero.additional_info}</td>
+                    <td>
+                        <button onclick="editHero('${hero._id}')">Edit</button>
+                        <button onclick="deleteHero('${hero._id}')">Delete</button>
+                    </td>
+                </tr>`;
+                table.innerHTML += row;
+            });
+        }
+
+        // 📌 Add Superhero
+        document.getElementById("superheroForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const newHero = {
+                real_name: document.getElementById("real_name").value,
+                hero_name: document.getElementById("hero_name").value,
+                photo_url: document.getElementById("photo_url").value,
+                additional_info: document.getElementById("additional_info").value
+            };
+            await fetch(apiBaseUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newHero)
+            });
+            this.reset();
+            fetchSuperheroes();
+        });
+
+        // 📌 Delete Superhero
+        async function deleteHero(id) {
+            await fetch(`${apiBaseUrl}/${id}`, { method: "DELETE" });
+            fetchSuperheroes();
+        }
+
+        // 📌 Edit Superhero (Basic Example)
+        async function editHero(id) {
+            const newName = prompt("Enter new Hero Name:");
+            if (newName) {
+                await fetch(`${apiBaseUrl}/${id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ hero_name: newName })
+                });
+                fetchSuperheroes();
+            }
+        }
+
+        // Fetch superheroes on page load
+        fetchSuperheroes();
+    </script>
+
+</body>
+</html>
