@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Superhero</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        table { width: 80%; margin: auto; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 10px; text-align: center; }
+        img { width: 50px; height: 50px; border-radius: 50%; }
+        button, a { padding: 5px 10px; margin: 5px; text-decoration: none; border: 1px solid black; background-color: #4CAF50; color: white; border-radius: 4px; }
+        a:hover, button:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <h1>Add a New Superhero</h1>
+    <form id="addForm">
+        <input type="text" id="real_name" placeholder="Real Name" required><br>
+        <input type="text" id="hero_name" placeholder="Hero Name" required><br>
+        <input type="text" id="photo_url" placeholder="Photo URL" required><br>
+        <input type="text" id="additional_info" placeholder="Additional Info" required><br>
+        <button type="submit">Add Superhero</button>
+    </form>
+
+    <script>
+        document.getElementById("addForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const newHero = {
+                real_name: document.getElementById("real_name").value,
+                hero_name: document.getElementById("hero_name").value,
+                photo_url: document.getElementById("photo_url").value,
+                additional_info: document.getElementById("additional_info").value
+            };
+
+            await fetch("http://localhost:3000/api/superheroes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newHero)
+            });
+
+            window.location.href = "/"; // Redirect to main page
+        });
+    </script>
+</body>
+</html>
